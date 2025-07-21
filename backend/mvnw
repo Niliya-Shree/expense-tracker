@@ -1,0 +1,113 @@
+#!/usr/bin/env sh
+
+#
+# Copyright 2001-2004 The Apache Software Foundation.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# -----------------------------------------------------------------------------
+# Maven Start Up Batch script
+#
+# Required ENV vars:
+# ------------------
+#   JAVA_HOME - location of a JRE/JDK
+#
+# Optional ENV vars
+# -----------------
+#   MAVEN_OPTS - parameters passed to the Java VM when running Maven
+#     e.g. to debug Maven itself, use
+#       set MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+#   MAVEN_SKIP_RC - flag to disable loading of mavenrc files
+# -----------------------------------------------------------------------------
+
+# Begin all one-time setup
+#
+if [ -z "$JAVA_HOME" ]; then
+  # Find the Java command
+  if [ -n "$(command -v java)" ]; then
+    # No JAVA_HOME, try to fall back to JAVA_CMD
+    JAVA_CMD="$(command -v java)"
+  fi
+else
+  JAVA_CMD="$JAVA_HOME/bin/java"
+fi
+
+if [ -z "$JAVA_CMD" ]; then
+  echo "Error: JAVA_HOME is not defined, and java is not in your PATH." >&2
+  exit 1
+fi
+
+# We're using a semi-private API, so we need to add the --add-opens options
+# to the command line
+if ! "$JAVA_CMD" -version 2>&1 | grep -q "version \"1[0-8]\\."; then
+  MAVEN_OPTS="--add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED $MAVEN_OPTS"
+fi
+
+# End all one-time setup
+
+# For Darwin, add options to specify how the application appears in the dock
+if [ "$(uname)" = "Darwin" ]; then
+    MAVEN_OPTS="-Xdock:name=Maven -Xdock:icon=\"$M2_HOME/bin/m2.icns\" $MAVEN_OPTS"
+fi
+
+# Set MAVEN_HOME if not already set
+if [ -z "$MAVEN_HOME" ]; then
+  ## resolve links - $0 may be a link to maven's script
+  PRG="$0"
+
+  # need this for relative symlinks
+  while [ -h "$PRG" ] ; do
+    ls=`ls -ld "$PRG"`
+    link=`expr "$ls" : '.*-> \(.*\)$'`
+    if expr "$link" : '/.*' > /dev/null; then
+      PRG="$link"
+    else
+      PRG=`dirname "$PRG"`"/$link"
+    fi
+  done
+
+  MAVEN_HOME=`dirname "$PRG"`/..
+
+  # make it fully qualified
+  MAVEN_HOME=`cd "$MAVEN_HOME" >/dev/null && pwd`
+elif [ ! -d "$MAVEN_HOME" ]; then
+  echo "Error: MAVEN_HOME is set to an invalid directory: $MAVEN_HOME" >&2
+  exit 1
+fi
+
+# Set MAVEN_BASEDIR
+if [ -z "$MAVEN_BASEDIR" ]; then
+  MAVEN_BASEDIR="`pwd`"
+fi
+
+MAVEN_PROJECT_BUILD_DIR="$MAVEN_BASEDIR/target"
+
+# Set the project classpath
+if [ -f "$MAVEN_PROJECT_BUILD_DIR/maven-classpath.txt" ]; then
+    CLASSWORLDS_JAR=`cat "$MAVEN_PROJECT_BUILD_DIR/maven-classpath.txt"`
+else
+    # We need to use the wrapper for this
+    CLASSWORLDS_JAR="$MAVEN_HOME/.mvn/wrapper/maven-wrapper.jar"
+fi
+
+# Set the maven launcher
+MAVEN_LAUNCHER_JAR="$MAVEN_HOME/.mvn/wrapper/maven-wrapper.jar"
+
+exec "$JAVA_CMD" \
+  $MAVEN_OPTS \
+  -classpath "$MAVEN_LAUNCHER_JAR" \
+  "-Dmaven.home=$MAVEN_HOME" \
+  "-Dmaven.base.dir=$MAVEN_BASEDIR" \
+  org.apache.maven.wrapper.MavenWrapperMain \
+  "$@" 
